@@ -10,7 +10,7 @@ public class Main {
     }
 
     private void doStuff() {
-        VisualBase vis = new VisualBase(PApplet.P2D, 1280) {
+        VisualBase vis = new VisualBase(PApplet.P2D, true,false, 1280) {
 
             PShader cakeShader;
             PShader verticalOffsetShader;
@@ -33,8 +33,7 @@ public class Main {
             }
 
             @Override
-            void doDraw(PGraphics g) {
-
+            protected void doDraw(PGraphics g) {
                 if (frameCount % 400 == 0)
                     g.background(255);
 
@@ -74,7 +73,7 @@ public class Main {
             }
 
             @Override
-            void doPost(PGraphics g) {
+            protected void doPost(PGraphics g) {
                 cakeShader.set("u_resolution", (float) g.width, (float) g.height);
                 cakeShader.set("u_mode", cakeMode);
                 cakeShader.set("u_time", millis() / 1000f);

@@ -24,6 +24,26 @@
             <artifactId>jogl-all-main</artifactId>
             <version>2.3.2</version>
         </dependency>
+        <dependency>
+            <groupId>hype</groupId>
+            <artifactId>hype</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/HYPE.jar</systemPath>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <release>10</release>  or <!--<release>10</release>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
