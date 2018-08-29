@@ -8,12 +8,9 @@ import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 
+import java.util.Arrays;
+
 public abstract class VisualBase extends PApplet {
-    public static final int DPI = 720;
-    public static final float[] paperDimensions = {11.7f, 16.54f};
-    //public static final int[] offScreenDimensions = {11906, 8419};
-    public static final int[] offScreenDimensions = {12000, 8500};
-    public static final HColorPool standardColors = new HColorPool(0xffFFFFFF, 0xffF7F7F7, 0xffECECEC, 0xff333333, 0xff0095a8, 0xff00616f, 0xffFF3300, 0xffFF6600);
     public static final HGroupColorPool colorPools = new HGroupColorPool(
             new HColorPool(0xffFFFFFF, 0xffF7F7F7, 0xffECECEC, 0xff333333, 0xff0095a8, 0xff00616f, 0xffFF3300, 0xffFF6600),
             new HColorPool(0xffCCCCCC, 0xff333333, 0xff0095a8, 0xff00616f, 0xffFF3300, 0xffFF6600, 0xff008B60),
@@ -37,72 +34,44 @@ public abstract class VisualBase extends PApplet {
             new HColorPool(0xff333333, 0xffdd3333, 0xff33dd33, 0xff3333dd, 0xffaa3377, 0xff7733aa)
     );
 
-    /*
-    // Raw color pools
-    {0xffFFFFFF,0xffF7F7F7,0xffECECEC,0xff333333,0xff0095a8,0xff00616f,0xffFF3300,0xffFF6600};
-    {0xffCCCCCC,0xff333333,0xff0095a8,0xff00616f,0xffFF3300,0xffFF6600,0xff008B60};
-    {0xffCC0000,0xffDD0000,0xffEE0000,0xffFF0000,0xffFF3333,0xffFF6666,0xffFF8888,0xffFFAAAA,0xffFFBBBB};
-    {0xff000000,0xff555555,0xff666666,0xff777777,0xff888888};
-
-    {0xffDA4B61,0xffF05246,0xffE1AC57,0xff6CAC90,0xff377874};
-    {0xffEA1830,0xff5869FF,0xffC61212,0xffFF4C0F,0xff7E8AE8};
-    {0xff333333,0xff5869FF,0xffC61212,0xffFF4C0F,0xff7E8AE8};
-    {0xff333333,0xffE0E0E0,0xffF0F0F0,0xffFFFFFF,0xff0000FF,0xffFF0000};
-    {0xff333333,0xffE0E0E0,0xffF0F0F0,0xffFFFFFF,0xff8569FF,0xffC61212,0xffFF4C0F,0xff7E8AE8};
-    {0xffFF6600,0xffFF3300,0xff00616F,0xff0095A8,0xff333333,0xffECECEC,0xffF7F7F7,0xffFFFFFF};
-    {0xff000000,0xff555555,0xff666666,0xff777777,0xff888888};
-    {0xff111111,0xff666666,0xffFF6600,0xff22AA22,0xff3333DD,0xffFF4444};
-
-    {0xff808080,0xff247bf4,0xff469e38,0xff43c9e8,0xff888888,0xfff2596b};
-    {0xffdd4f75,0xfff2712b,0xfff49e24,0xffce101d,0xff9e24f4,0xffc63d66};
-    {0xff8a32c5,0xffecb4bf,0xffbfffe6,0xffff10ec,0xffaaaaaa,0xffc63d66};
-    {0xff8795e8,0xff47d1d5,0xffa7e4ae,0xff94d0ff,0xffff3dfb,0xfff2596b};
-    {0xffdd4f75,0xfff2712b,0xfff49e24,0xff9e24f4,0xffaaaaaa,0xffc63d66};
-    {0xf0606060,0xff247bf4,0xff469e38,0xff888888,0xffff3dfb,0xfff2596b};
-    {0xffff0000,0xff00ff00,0xff0000ff,0xffffffff,0xffaaaaaa,0xff333333};
-    {0xff333333,0xffdd3333,0xff33dd33,0xff3333dd,0xffaa3377,0xff7733aa};
-     */
-
-    private final int w;
     private final String renderer;
+    private final int targetFPS;
+    protected final Dimensions offScreenDimensions;
+    protected final Dimensions onScreenDimensions;
+    private final boolean usePost;
+    protected final float scaleFactor;
 
     private boolean controlPressed;
     private boolean shiftPressed;
     private boolean altPressed;
     private boolean spacePressed;
 
-    private final boolean usePost;
+    private boolean captureNextFrame = false;
 
     protected PGraphics offScreen;
     protected PGraphics offScreen2;
-    protected final float scaleF;
     protected HColorPool colorPool = colorPools.getNextColorPool();
 
     private boolean doColorSetup = true;
 
-    protected VisualBase(String renderer, boolean usePost, boolean doColorSetup, int w) {
+    protected VisualBase(String renderer, Dimensions offScreenDimensions, int targetFPS, boolean usePost, boolean doColorSetup, int onScreenWidth) {
         super();
         this.renderer = renderer;
+        this.offScreenDimensions = offScreenDimensions;
+        this.targetFPS = targetFPS;
         this.usePost = usePost;
         this.doColorSetup = doColorSetup;
-        scaleF = (float) offScreenDimensions[0] / w;
-        this.w = w;
+        this.scaleFactor = (float) offScreenDimensions.getWidth() / onScreenWidth;
+        this.onScreenDimensions = Dimensions.Custom(onScreenWidth, (int) (offScreenDimensions.getHeight() / scaleFactor));
     }
 
     @Override
     public void settings() {
         super.settings();
-        size(this.w, (int) (offScreenDimensions[1] / scaleF), P2D);
+        size(this.onScreenDimensions.getWidth(), this.onScreenDimensions.getHeight(), P2D);
     }
 
     private void initialize() {
-        offScreen = createGraphics(offScreenDimensions[0], offScreenDimensions[1], this.renderer);
-        offScreen.smooth(8);
-        if (usePost) {
-            offScreen2 = createGraphics(offScreenDimensions[0], offScreenDimensions[1], P2D);
-            offScreen2.noSmooth();
-        }
-
         offScreen.beginDraw();
         init(offScreen);
         offScreen.endDraw();
@@ -111,14 +80,10 @@ public abstract class VisualBase extends PApplet {
     protected void init(PGraphics g) {
     }
 
-    public void run() {
+    protected void run() {
         String[] args = {this.getClass().getName()};
         PApplet.runSketch(args, this);
     }
-
-    private boolean firstRun = true;
-    private boolean captureNextFrame = false;
-    private boolean hInited = false;
 
     protected int makeNoiseColor(int seed) {
         return HColors.merge(255,
@@ -128,100 +93,77 @@ public abstract class VisualBase extends PApplet {
         );
     }
 
+    private void addNoiseColor(int... seeds) {
+        colorPools.add(new HColorPool(
+                Arrays.stream(seeds).map(this::makeNoiseColor).toArray()
+        ));
+    }
+
+    private void addNoiseColors() {
+        addNoiseColor(1, 2, 3, 4, 5);
+        addNoiseColor(10, 20, 30, 40, 50);
+        addNoiseColor(100, 200, 300, 400, 500);
+        addNoiseColor(1000, 2000, 3000, 4000, 5000);
+        addNoiseColor(139, 85, 3158, 815, 91231);
+        addNoiseColor(1001, 1002, 1003, 1004, 1005);
+        addNoiseColor(2001, 2002, 2003, 2004, 2005);
+        addNoiseColor(3001, 3003, 3005, 3007, 3009);
+        addNoiseColor(4001, 4003, 4005, 4007, 4009);
+        addNoiseColor(4000, 4005, 4010, 4015, 4020);
+        addNoiseColor(4000, 4008, 4016, 4024, 4032);
+    }
+
+    private boolean firstRun = true;
+    private boolean hInited = false;
+    private boolean offScreenInitialized = false;
+
+    private void initializeOffScreen() {
+        offScreen = createGraphics(offScreenDimensions.getWidth(), offScreenDimensions.getHeight(), this.renderer);
+        offScreen.smooth(8);
+        if (usePost) {
+            offScreen2 = createGraphics(offScreenDimensions.getWidth(), offScreenDimensions.getHeight(), P2D);
+            offScreen2.noSmooth();
+        }
+    }
+
     @Override
     public void draw() {
-        if (!hInited) {
-            H.init(this);
-            frameRate(30);
-            hInited = true;
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(1),
-                    makeNoiseColor(2),
-                    makeNoiseColor(3),
-                    makeNoiseColor(4),
-                    makeNoiseColor(5)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(10),
-                    makeNoiseColor(20),
-                    makeNoiseColor(30),
-                    makeNoiseColor(40),
-                    makeNoiseColor(50)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(100),
-                    makeNoiseColor(200),
-                    makeNoiseColor(300),
-                    makeNoiseColor(400),
-                    makeNoiseColor(500)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(1000),
-                    makeNoiseColor(2000),
-                    makeNoiseColor(3000),
-                    makeNoiseColor(4000),
-                    makeNoiseColor(5000)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(139),
-                    makeNoiseColor(85),
-                    makeNoiseColor(3158),
-                    makeNoiseColor(815),
-                    makeNoiseColor(91231)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(1001),
-                    makeNoiseColor(1002),
-                    makeNoiseColor(1003),
-                    makeNoiseColor(1004),
-                    makeNoiseColor(1005)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(2001),
-                    makeNoiseColor(2002),
-                    makeNoiseColor(2003),
-                    makeNoiseColor(2004),
-                    makeNoiseColor(2005)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(3001),
-                    makeNoiseColor(3003),
-                    makeNoiseColor(3005),
-                    makeNoiseColor(3007),
-                    makeNoiseColor(3009)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(4001),
-                    makeNoiseColor(4003),
-                    makeNoiseColor(4005),
-                    makeNoiseColor(4007),
-                    makeNoiseColor(4009)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(4000),
-                    makeNoiseColor(4005),
-                    makeNoiseColor(4010),
-                    makeNoiseColor(4015),
-                    makeNoiseColor(4020)
-            ));
-            colorPools.add(new HColorPool(
-                    makeNoiseColor(4000),
-                    makeNoiseColor(4008),
-                    makeNoiseColor(4016),
-                    makeNoiseColor(4024),
-                    makeNoiseColor(4032)
-            ));
+        if (!offScreenInitialized) {
+            initializeOffScreen();
+            frameRate(targetFPS);
+            offScreenInitialized = true;
+
+            return;
         }
 
         if (doColorSetup) {
             background(255);
-            translate(width / 2, height / 2);
+            translate(width / 2f, height / 2f);
             noStroke();
             for (int i = 0; i < colorPool.size(); i++) {
                 fill(colorPool.getColorAt(i));
-                rect((i - (int) (colorPool.size() / 2)) * 100f, -100f, 90f, 200f);
+                rect((i - colorPool.size() / 2f) * 100f, -100f, 90f, 200f);
             }
             return;
+        }
+
+        if (!hInited) {
+            PGraphics oldG = this.g;
+            this.width = this.offScreenDimensions.getWidth();
+            this.height = this.offScreenDimensions.getHeight();
+            offScreen.beginDraw();
+            this.g = offScreen;
+
+            H.init(this);
+
+            this.g = oldG;
+            offScreen.endDraw();
+            this.width = this.onScreenDimensions.getWidth();
+            this.height = this.onScreenDimensions.getHeight();
+
+            addNoiseColors();
+
+            hInited = true;
         }
 
         if (firstRun) {
@@ -239,8 +181,17 @@ public abstract class VisualBase extends PApplet {
             captureNextFrame = false;
         }
 
+        PGraphics oldG = this.g;
         offScreen.beginDraw();
+        this.g = offScreen;
+        this.width = this.offScreenDimensions.getWidth();
+        this.height = this.offScreenDimensions.getHeight();
+
         doDraw(offScreen);
+
+        this.width = this.onScreenDimensions.getWidth();
+        this.height = this.onScreenDimensions.getHeight();
+        this.g = oldG;
         offScreen.endDraw();
 
         if (usePost) {
@@ -255,7 +206,7 @@ public abstract class VisualBase extends PApplet {
             image(offScreen, 0, 0, width, height);
         }
 
-        if (frameCount % 30 == 0) {
+        if (frameCount % targetFPS == 0) {
             System.out.printf("frameRate: %f%n", frameRate);
         }
     }
