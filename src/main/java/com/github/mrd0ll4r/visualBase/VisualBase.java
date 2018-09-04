@@ -142,7 +142,9 @@ public abstract class VisualBase extends PApplet {
             noStroke();
             for (int i = 0; i < colorPool.size(); i++) {
                 fill(colorPool.getColorAt(i));
-                rect((i - colorPool.size() / 2f) * 100f, -100f, 90f, 200f);
+                stroke(50);
+                rect((i - colorPool.size() / 2f) * onScreenDimensions.getWidth() / 10f, -1f * onScreenDimensions.getWidth() / 10f,
+                        onScreenDimensions.getWidth() / 11f, onScreenDimensions.getWidth() / 5f);
             }
             return;
         }
