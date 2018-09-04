@@ -181,17 +181,10 @@ public abstract class VisualBase extends PApplet {
             captureNextFrame = false;
         }
 
-        PGraphics oldG = this.g;
         offScreen.beginDraw();
-        this.g = offScreen;
-        this.width = this.offScreenDimensions.getWidth();
-        this.height = this.offScreenDimensions.getHeight();
 
         doDraw(offScreen);
 
-        this.width = this.onScreenDimensions.getWidth();
-        this.height = this.onScreenDimensions.getHeight();
-        this.g = oldG;
         offScreen.endDraw();
 
         if (usePost) {
