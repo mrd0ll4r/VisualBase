@@ -215,6 +215,8 @@ public abstract class VisualBase extends PApplet {
 
     protected abstract void doDraw(PGraphics g);
 
+    protected void onColorPoolChange(){};
+
     @Override
     public void keyPressed() {
         super.keyPressed();
@@ -240,12 +242,15 @@ public abstract class VisualBase extends PApplet {
                 break;
             case 'n':
                 colorPool = colorPools.getNextColorPool();
+                onColorPoolChange();
                 break;
             case 'p':
                 colorPool = colorPools.getPrevColorPool();
+                onColorPoolChange();
                 break;
             case 'r':
                 colorPool = colorPools.getRandomColorPool();
+                onColorPoolChange();
                 break;
             case 'd':
                 doColorSetup = false;
