@@ -5,7 +5,7 @@ public final class Dimensions {
     private final int height;
 
     public static final Dimensions A3Horizontal = new Dimensions(12000, 8500);
-    public static final Dimensions A3Vertical = new Dimensions(8500, 1200);
+    public static final Dimensions A3Vertical = new Dimensions(8500, 12000);
     public static final Dimensions A3Square = new Dimensions(8500, 8500);
 
     public static final Dimensions A3PreciseHorizontal = new Dimensions(11908, 8420);
