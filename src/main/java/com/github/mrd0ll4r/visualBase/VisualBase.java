@@ -120,9 +120,11 @@ public abstract class VisualBase extends PApplet {
     private void initializeOffScreen() {
         offScreen = createGraphics(offScreenDimensions.getWidth(), offScreenDimensions.getHeight(), this.renderer);
         offScreen.smooth(8);
+        offScreen.hint(PConstants.ENABLE_ASYNC_SAVEFRAME);
         if (usePost) {
             offScreen2 = createGraphics(offScreenDimensions.getWidth(), offScreenDimensions.getHeight(), P2D);
             offScreen2.noSmooth();
+            offScreen2.hint(PConstants.ENABLE_ASYNC_SAVEFRAME);
         }
     }
 
