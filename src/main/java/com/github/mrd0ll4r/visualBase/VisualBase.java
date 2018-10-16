@@ -47,6 +47,7 @@ public abstract class VisualBase extends PApplet {
     private boolean spacePressed;
 
     private boolean captureNextFrame = false;
+    private boolean captureNextFrameLowRes = false;
     private boolean recordLowRes = false;
     private boolean recordHighRes = false;
     private int recordStartLowRes = 0;
@@ -220,6 +221,13 @@ public abstract class VisualBase extends PApplet {
             save(p);
         }
 
+        if (captureNextFrameLowRes) {
+            save(String.format("frame-%d-lowres.png", frameCount));
+
+            System.out.printf("exported to frame-%d-lowres.png%n", frameCount);
+            captureNextFrameLowRes = false;
+        }
+
         if (frameCount % targetFPS == 0) {
             System.out.printf("frameRate: %f%n", frameRate);
         }
@@ -253,6 +261,9 @@ public abstract class VisualBase extends PApplet {
                 break;
             case 'c':
                 captureNextFrame = true;
+                break;
+            case 'x':
+                captureNextFrameLowRes = true;
                 break;
             case 'n':
                 colorPool = colorPools.getNextColorPool();
