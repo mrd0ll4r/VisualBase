@@ -47,6 +47,10 @@ public abstract class VisualBase extends PApplet {
     private boolean spacePressed;
 
     private boolean captureNextFrame = false;
+    private boolean recordLowRes = false;
+    private boolean recordHighRes = false;
+    private int recordStartLowRes = 0;
+    private int recordStartHighRes = 0;
 
     protected PGraphics offScreen;
     protected PGraphics offScreen2;
@@ -175,6 +179,14 @@ public abstract class VisualBase extends PApplet {
             firstRun = false;
         }
 
+        if (recordHighRes) {
+            String p = String.format("records/high/%d/frame-%d.png", recordStartHighRes, frameCount);
+            if (usePost)
+                offScreen2.save(p);
+            else
+                offScreen.save(p);
+        }
+
         if (captureNextFrame) {
             if (usePost)
                 offScreen2.save(String.format("frame-%d.png", frameCount));
@@ -201,6 +213,11 @@ public abstract class VisualBase extends PApplet {
             image(offScreen2, 0, 0, width, height);
         } else {
             image(offScreen, 0, 0, width, height);
+        }
+
+        if (recordLowRes) {
+            String p = String.format("records/low/%d/frame-%d.png", recordStartLowRes, frameCount);
+            save(p);
         }
 
         if (frameCount % targetFPS == 0) {
@@ -251,6 +268,24 @@ public abstract class VisualBase extends PApplet {
                 break;
             case 'd':
                 doColorSetup = false;
+                break;
+            case 'q':
+                if (recordLowRes) {
+                    System.out.println("done recording.");
+                } else {
+                    recordStartLowRes = frameCount;
+                    System.out.printf("beginning recording to records/low/%d/%n", frameCount);
+                }
+                recordLowRes = !recordLowRes;
+                break;
+            case 'w':
+                if (recordHighRes) {
+                    System.out.println("done recording.");
+                } else {
+                    recordStartHighRes = frameCount;
+                    System.out.printf("beginning recording to records/high/%d/.%n", frameCount);
+                }
+                recordHighRes = !recordHighRes;
                 break;
         }
     }
