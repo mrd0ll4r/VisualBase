@@ -186,6 +186,11 @@ public abstract class VisualBase extends PApplet {
                 offScreen2.save(p);
             else
                 offScreen.save(p);
+
+            int numFrames = frameCount - recordStartHighRes;
+            if (numFrames % (targetFPS/2) == 0) {
+                System.out.printf("recorded %.2fs of high-res frames%n", numFrames / (targetFPS * 1f));
+            }
         }
 
         if (captureNextFrame) {
@@ -219,6 +224,11 @@ public abstract class VisualBase extends PApplet {
         if (recordLowRes) {
             String p = String.format("records/low/%d/frame-%d.png", recordStartLowRes, frameCount);
             save(p);
+
+            int numFrames = frameCount - recordStartLowRes;
+            if (numFrames % (targetFPS/2) == 0) {
+                System.out.printf("recorded %.2fs of low-res frames%n", numFrames / (targetFPS * 1f));
+            }
         }
 
         if (captureNextFrameLowRes) {
@@ -282,7 +292,7 @@ public abstract class VisualBase extends PApplet {
                 break;
             case 'q':
                 if (recordLowRes) {
-                    System.out.println("done recording.");
+                    System.out.printf("done recording, recorded %d frames, that's approx %.2fs.%n", frameCount - recordStartLowRes, (frameCount - recordStartLowRes) / (targetFPS * 1f));
                 } else {
                     recordStartLowRes = frameCount;
                     System.out.printf("beginning recording to records/low/%d/%n", frameCount);
@@ -291,7 +301,7 @@ public abstract class VisualBase extends PApplet {
                 break;
             case 'w':
                 if (recordHighRes) {
-                    System.out.println("done recording.");
+                    System.out.printf("done recording, recorded %d frames, that's approx %.2fs.%n", frameCount - recordStartHighRes, (frameCount - recordStartHighRes) / (targetFPS * 1f));
                 } else {
                     recordStartHighRes = frameCount;
                     System.out.printf("beginning recording to records/high/%d/.%n", frameCount);
