@@ -16,6 +16,11 @@ public final class Dimensions {
     public static final Dimensions A3BinaryVertical = new Dimensions(8192, 11585);
     public static final Dimensions A3BinarySquare = new Dimensions(8192, 8192);
 
+    public static final Dimensions InstagramHorizontal = new Dimensions(1800, 945);
+    public static final Dimensions InstagramVertical = new Dimensions(864, 1080);
+    public static final Dimensions InstagramSquare = new Dimensions(1080, 1080);
+    public static final Dimensions InstagramStory = new Dimensions(1080, 1920);
+
     private Dimensions(int width, int height) {
         this.width = width;
         this.height = height;
