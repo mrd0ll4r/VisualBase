@@ -1,6 +1,7 @@
 package com.github.mrd0ll4r.visualBase;
 
 import hype.H;
+import hype.HColors;
 import hype.HRect;
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -16,6 +17,8 @@ public class Main extends VisualBase {
     private boolean cakeActive = false;
     private int repeatAngleIndex = 0;
     private HRect rect1;
+    private GradientCircle circle;
+    private GradientRing ring;
 
     private Main() {
         super(PApplet.P2D, Dimensions.A3Horizontal, 40, true, false, 1280);
@@ -44,6 +47,15 @@ public class Main extends VisualBase {
         H.add(rect1);
 
         H.autoClears(false);
+
+        circle = new GradientCircle(
+                HColors.merge(0, 240, 240, 240),
+                HColors.merge(230, 240, 240, 240),
+                200 * scaleFactor, 200);
+        ring = new GradientRing(
+                HColors.merge(230, 20, 20, 20),
+                HColors.merge(0, 20, 20, 20),
+                200 * scaleFactor, 220 * scaleFactor, 200);
     }
 
     @Override
@@ -84,6 +96,22 @@ public class Main extends VisualBase {
             g.popMatrix();
         }
         g.popMatrix();
+
+        if (frameCount % 1 == 0) {
+            g.pushMatrix();
+            {
+                g.translate(random(g.width), random(g.height));
+                circle.drawOn(g);
+            }
+            g.popMatrix();
+
+            g.pushMatrix();
+            {
+                g.translate(random(g.width), random(g.height));
+                ring.drawOn(g);
+            }
+            g.popMatrix();
+        }
 
         rect1.loc((onScreenDimensions.getWidth() / 2f + onScreenDimensions.getWidth() / 2f * sin(frameCount * 0.04f)) * scaleFactor,
                 offScreenDimensions.getHeight() / 2f);
