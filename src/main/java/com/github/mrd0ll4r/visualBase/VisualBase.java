@@ -98,6 +98,22 @@ public abstract class VisualBase extends PApplet {
         );
     }
 
+    protected int millisFromFrameCount() {
+        return (int) ((1000f / targetFPS) * frameCount);
+    }
+
+    protected float cnoise(float x) {
+        return noise(x / offScreenDimensions.getWidth());
+    }
+
+    protected float cnoise(float x, float y) {
+        return noise(x / offScreenDimensions.getWidth(), y / offScreenDimensions.getHeight());
+    }
+
+    protected float cnoise(float x, float y, float t) {
+        return noise(x / offScreenDimensions.getWidth(), y / offScreenDimensions.getHeight(), t);
+    }
+
     private void addNoiseColor(int... seeds) {
         colorPools.add(new HColorPool(
                 Arrays.stream(seeds).map(this::makeNoiseColor).toArray()
@@ -188,7 +204,7 @@ public abstract class VisualBase extends PApplet {
                 offScreen.save(p);
 
             int numFrames = frameCount - recordStartHighRes;
-            if (numFrames % (targetFPS/2) == 0) {
+            if (numFrames % (targetFPS / 2) == 0) {
                 System.out.printf("recorded %.2fs of high-res frames%n", numFrames / (targetFPS * 1f));
             }
         }
@@ -226,7 +242,7 @@ public abstract class VisualBase extends PApplet {
             save(p);
 
             int numFrames = frameCount - recordStartLowRes;
-            if (numFrames % (targetFPS/2) == 0) {
+            if (numFrames % (targetFPS / 2) == 0) {
                 System.out.printf("recorded %.2fs of low-res frames%n", numFrames / (targetFPS * 1f));
             }
         }
@@ -247,7 +263,10 @@ public abstract class VisualBase extends PApplet {
 
     protected abstract void doDraw(PGraphics g);
 
-    protected void onColorPoolChange(){};
+    protected void onColorPoolChange() {
+    }
+
+    ;
 
     @Override
     public void keyPressed() {
